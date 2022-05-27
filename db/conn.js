@@ -1,5 +1,6 @@
 const { MongoClient } = require("mongodb");
-const {mongo} = require('./conf.js');
+const {mongo} = require('../conf.js');
+const connectionString = `mongodb://${mongo.user}:${mongo.pass}@${mongo.host}`;
 
 
 const client = new MongoClient(connectionString, {
@@ -11,25 +12,19 @@ let dbConnection;
 
 
 module.exports = {
-    connect: function (callback) {
-        if(dbConnection)
-        {
-            console.log('Already connected to MongoDB.');
-        }
-
-        client.connect(function (err, db) {
-            if (err || !db) {
-                return callback(err);
+    connect: function ()
+    {
+        return new Promise((resolve, reject)=>{
+            try
+            {
+                client.connect().then(()=>{
+                    resolve(client.db('stoneCircles'));
+                });
             }
-
-            dbConnection = db.db("stoneCircles");
-            console.log("Successfully connected to MongoDB.");
-
-            return callback();
+            catch(e)
+            {
+                reject(e)
+            }
         });
-    },
-
-    getDb: function () {
-        return dbConnection;
-    },
+    }
 };
