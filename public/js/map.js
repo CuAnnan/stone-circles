@@ -72,7 +72,7 @@
 
                         let marker = new maplibregl.Marker({element:element})
                             .setLngLat([site.longitude, site.latitude])
-                            .setPopup(new maplibregl.Popup().setHTML(`<table><tr><th>Type:</th><td>${site.classdesc}</td></tr><tr><th>Townland:</th><td>${townlandName}</td></tr><tr><th>SMRS:</th><td>${site.smrs}</td></tr></table>`))
+                            .setPopup(new maplibregl.Popup().setHTML(`<table><tr><th>Type:</th><td>${site.classdesc}</td></tr><tr><th>Townland:</th><td>${townlandName}</td></tr><tr><th>SMRS:</th><td>${site.smrs}</td></tr><tr><td colspan="2"><a href="http://maps.apple.com/?q=${site.latitude},${site.longitude}">Open in Apple Maps</a></td></tr></table>`))
                             .addTo(map);
                     }
                 }
