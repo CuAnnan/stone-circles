@@ -24,4 +24,6 @@ router.get('/allTypes', function(req, res,next){
     });
 });
 
+
+
 module.exports = router;

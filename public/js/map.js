@@ -1,6 +1,8 @@
 (function($){
-    let map;
+    let map, $map;
+    let sidebar = false;
     $(function(){
+        $map = $('#map');
         navigator.geolocation.getCurrentPosition(
             (pos)=>{
                 loadMap(pos.coords);
@@ -14,6 +16,17 @@
                 maximumAge: 0
             }
         );
+        $('#doubleArrow').click(()=>{
+            sidebar = !sidebar;
+            if(sidebar)
+            {
+                $map.css({'right':"25%"});
+            }
+            else
+            {
+                $map.css({'right':"0%"});
+            }
+        });
     });
 
     function getMapBBox()
@@ -62,7 +75,7 @@
                         element.classList.add('marker');
 
                         let imgElement= document.createElement('img');
-                        imgElement.src='img/icon.png';
+                        imgElement.src='img/cromlech.png';
                         element.append(imgElement);
 
                         let townlandName = site.townland_name.toLowerCase();

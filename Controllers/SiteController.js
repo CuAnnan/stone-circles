@@ -31,7 +31,7 @@ class SiteController extends Controller
     static async getSiteTypes(req, res)
     {
         let db=this.getDB(req, res);
-        let typesJSON = await db.collection('types').find({"name":{"$regex":"Stone circle.*"}}, {projection:{ _id: 0 }}).toArray();
+        let typesJSON = await db.collection('types').find({}, {projection:{ _id: 0 }}).toArray();
         let types = [];
         for(let val of typesJSON)
         {
