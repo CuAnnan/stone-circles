@@ -24,6 +24,10 @@ router.get('/allTypes', function(req, res,next){
     });
 });
 
-
+router.get('/GeoJSON', function(req, res, next){
+    Controller.getSitesForAreaAsFeatures(req, res).catch((err)=>{
+        next();
+    });
+});
 
 module.exports = router;
