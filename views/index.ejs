@@ -64,52 +64,82 @@
 </head>
 <body>
 <div id="map" class="map">
-<!--  <div id="doubleArrow">&gt;&gt;</div>-->
+  <div id="doubleArrow">&gt;&gt;</div>
 </div>
-<!--<div id="filters">-->
-<!--  <div class="container">-->
-<!--  <h1>Filter options</h1>-->
+<div id="filters">
+  <div class="container">
+  <h1>Filter options</h1>
 
-<!--    <form method="post" action="#" onsubmit="return false;">-->
-<!--      <div class="row mb-3">-->
-<!--        <label for="counties" class="col-sm-2 col-form-label">Counties</label>-->
-<!--        <div class="col-sm-10">-->
-<!--          <select id="counties" multiple>-->
-<!--            <option value="">Choose zero or more</option>-->
-<!--            <option>Carlow</option>-->
-<!--            <option>Cavan</option>-->
-<!--            <option>Clare</option>-->
-<!--            <option>Cork</option>-->
-<!--            <option>Donegal</option>-->
-<!--            <option>Dublin</option>-->
-<!--            <option>Galway</option>-->
-<!--            <option>Kerry</option>-->
-<!--            <option>Kildare</option>-->
-<!--            <option>Kilkenny</option>-->
-<!--            <option>Laois</option>-->
-<!--            <option>Leitrim</option>-->
-<!--            <option>Limerick</option>-->
-<!--            <option>Longford</option>-->
-<!--            <option>Louth</option>-->
-<!--            <option>Mayo</option>-->
-<!--            <option>Meath</option>-->
-<!--            <option>Monaghan</option>-->
-<!--            <option>Offaly</option>-->
-<!--            <option>Roscommon</option>-->
-<!--            <option>Sligo</option>-->
-<!--            <option>Tipperary</option>-->
-<!--            <option>Waterford</option>-->
-<!--            <option>Westmeath</option>-->
-<!--            <option>Wexford</option>-->
-<!--            <option>Wicklow</option>-->
-<!--          </select>-->
-<!--        </div>-->
-<!--      </div>-->
+    <form method="post" action="#" onsubmit="return false;">
+      <div class="row mb-3">
+        <label for="counties" class="col-sm-2 col-form-label">Counties</label>
+        <div class="col-sm-10">
+          <select id="counties" name="counties" multiple>
+            <option value="">Choose zero or more</option>
+            <option>Carlow</option>
+            <option>Cavan</option>
+            <option>Clare</option>
+            <option>Cork</option>
+            <option>Donegal</option>
+            <option>Dublin</option>
+            <option>Galway</option>
+            <option>Kerry</option>
+            <option>Kildare</option>
+            <option>Kilkenny</option>
+            <option>Laois</option>
+            <option>Leitrim</option>
+            <option>Limerick</option>
+            <option>Longford</option>
+            <option>Louth</option>
+            <option>Mayo</option>
+            <option>Meath</option>
+            <option>Monaghan</option>
+            <option>Offaly</option>
+            <option>Roscommon</option>
+            <option>Sligo</option>
+            <option>Tipperary</option>
+            <option>Waterford</option>
+            <option>Westmeath</option>
+            <option>Wexford</option>
+            <option>Wicklow</option>
+          </select>
+        </div>
+      </div>
 
-<!--    </form>-->
-<!--  </div>-->
+      <div class="row mb-3">
+        <label for="siteTypes" class="col-sm-2 col-form-label">Site Type(s)</label>
+        <div class="col-sm-10">
+          <select id="siteTypes" name="siteTypes" multiple>
+            <option value="">Choose zero or more</option>
+            <option>Anomalous stone group</option>
+            <option>Boulder-burial</option>
+            <option>Bullaun stone</option>
+            <option>Cairn</option>
+            <option>Cliff-edge fort</option>
+            <option>Henge</option>
+            <option>Hillfort</option>
+            <option>Hilltop enclosure</option>
+            <option>Megalithic structure</option>
+            <option>Megalithic tomb</option>
+            <option>Ogham stone</option>
+            <option>Ringfort</option>
+            <option>Rock art</option>
+            <option>Standing stone</option>
+            <option>Stone circle</option>
+            <option>Stone row</option>
+            <option>Stone sculpture - aniconic</option>
+            <option>Stone sculpture - iconic</option>
+          </select>
+        </div>
 
-<!--</div>-->
+        <div class="row">
+          <button class="btn btn-primary" id="doFilter">Filter</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
 <script type="text/javascript" src="js/map.js"></script>
 </body>
 </html>

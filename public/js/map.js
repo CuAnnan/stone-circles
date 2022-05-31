@@ -3,9 +3,13 @@
     let sidebar = false;
     let markers = {};
     let markersOnScreen = {};
+    let counties =[], $counties;
+    let siteTypes = [], $siteTypes;
 
     $(function(){
         $map = $('#map');
+        $('#doFilter').click(applyFilter);
+
         navigator.geolocation.getCurrentPosition(
             (pos)=>{
                 loadMap(pos.coords);
@@ -32,10 +36,20 @@
         });
     });
 
+    function applyFilter()
+    {
+        let filters = {
+            counties:$('#counties').val(),
+            types:$('#siteTypes').val()
+        };
+        updateSites(filters);
+    }
+
     function updateMarkers()
     {
         let newMarkers = {};
         let features = map.querySourceFeatures('sites');
+        let consoled = false;
 
         for(let feature of features)
         {
@@ -53,7 +67,19 @@
                 el.classList.add('marker');
 
                 let img = document.createElement('img');
-                img.src = '/img/cromlech.png';
+                if(props.classdesc.startsWith('Stone circle'))
+                {
+                    console.log(props);
+                    img.src = '/img/cromlech.png';
+                }
+                else if(props.classdesc.startsWith('Megalithic'))
+                {
+                    img.src = '/img/megalith.png';
+                }
+                else
+                {
+                    img.src='/img/monument.png';
+                }
                 el.append(img);
 
                 let townland = props.townland_name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
@@ -122,10 +148,28 @@
             updateMarkers();
         });
 
-        map.once("load", function(){
+        map.once("load", ()=>{updateSites();});
+    }
+
+    function updateSites(filters)
+    {
+        if(map.getSource('sites')) {
+            map.removeLayer('clusters');
+            map.removeLayer('cluster-count');
+            map.removeLayer('unclustered');
+            map.removeSource('sites');
+        }
+
+
+        $.ajax({
+            type:"POST",
+            url:'/sites/GeoJSON',
+            data:filters,
+            dataType:"json"})
+        .done(function(data){
             map.addSource('sites', {
                 type:'geojson',
-                data:'/sites/GeoJSON',
+                data:data,
                 cluster:true,
                 clusterMaxZoom:10,
                 clusterRadius:35

@@ -26,6 +26,14 @@ router.get('/allTypes', function(req, res,next){
 
 router.get('/GeoJSON', function(req, res, next){
     Controller.getSitesForAreaAsFeatures(req, res).catch((err)=>{
+        console.log(err);
+        next();
+    });
+});
+
+router.post('/GeoJSON', function(req, res, next){
+    Controller.getSitesForAreaAsFeatures(req, res).catch((err)=>{
+        console.log(err);
         next();
     });
 });
