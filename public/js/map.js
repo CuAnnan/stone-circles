@@ -41,34 +41,48 @@
         {
             let coords = feature.geometry.coordinates;
             let props = feature.properties;
-
             if(props.cluster)
             {
                 continue;
             }
-
             let id = props.objectid;
             let marker = markers[id];
             if(!marker)
             {
                 let el = document.createElement('div');
                 el.classList.add('marker');
+
                 let img = document.createElement('img');
                 img.src = '/img/cromlech.png';
                 el.append(img);
 
-                marker = markers[id] = new maplibregl.Marker({element:el}).setLngLat(coords);
+                let townland = props.townland_name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+                    return letter.toUpperCase();
+                });
+                let county = props.county.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+                    return letter.toUpperCase();
+                });
+
+                let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+                    `<table class="popup-table">
+                        <tr><th>County:</th><td>${county}</td></tr>
+                        <tr><th>Townland:</th><td>${townland}</td></tr>
+                        <tr><th>Type:</th><td>${props.classdesc}</td></tr>
+                        <tr><th>SMRS:</th><td>${props.smrs}</td></tr>
+                        <tr><td><a href="http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}">Navigate here</a></td></tr>
+                    </table>`
+                );
+
+                marker = markers[id] = new maplibregl.Marker({element:el})
+                    .setLngLat(coords)
+                    .setPopup(popup);
 
             }
-
             newMarkers[id] = marker;
-
             if(!markersOnScreen[id])
             {
                 marker.addTo(map);
             }
-
-
         }
 
         for (let id in markersOnScreen) {
@@ -123,7 +137,7 @@
                 source:'sites',
                 filter: ['has', 'point_count'],
                 paint: {
-                    'circle-color': '#51bbd6',
+                    'circle-color': '#66C547',
                     'circle-radius': [
                         'step',
                         ['get', 'point_count'],

@@ -15,7 +15,26 @@ class SiteController extends Controller
     {
         let db=this.getDB(req, res);
         let types = await this.getSiteTypes(req, res);
-        let qry = {'classdesc':{'$in':types}};
+        let qry = {
+            '$and':[
+                {'classdesc':{'$in':types}},
+                {"longitude":{"$gte":-15}}
+            ]
+        };
+
+        if(req.body.counties)
+        {
+            let counties = req.body.counties.split(',');
+            for(let county of counties)
+            {
+                county = county.trim().toUpperCase();
+            }
+
+            let countyQry = {'county':{'$in':req.body.county.toUpperCase().split(',')}};
+
+            qry.$and.push(countyQry);
+        }
+
         let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();
         return sites;
     }
@@ -61,9 +80,11 @@ class SiteController extends Controller
         let db=this.getDB(req, res);
         let typesJSON = await db.collection('types').find(
             {
-                "$or":[
-                    {"name":{"$regex":"Stone circle.*"}},
-                    //{"name":{"$regex":"Ringfort.*"}}
+                "$and":[
+                    {"$or":[
+                        {"name":{"$regex":"Stone circle.*"}},
+                        //{"name":{"$regex":"Ringfort.*"}}
+                    ]}
                 ]
             },
             {projection:{ _id: 0 }}

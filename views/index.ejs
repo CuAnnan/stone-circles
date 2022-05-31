@@ -5,6 +5,12 @@
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
   <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+
+
+
   <style>
     .map
     {
@@ -44,6 +50,11 @@
       cursor:pointer;
       padding-bottom: 5px;
     }
+
+    .popup-table th, .popup-table td
+    {
+      text-align: left;
+    }
   </style>
   <script
           src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -53,12 +64,52 @@
 </head>
 <body>
 <div id="map" class="map">
-  <div id="doubleArrow">&gt;&gt;</div>
+<!--  <div id="doubleArrow">&gt;&gt;</div>-->
 </div>
-<div id="filters">
-  <h1>Filter options</h1>
+<!--<div id="filters">-->
+<!--  <div class="container">-->
+<!--  <h1>Filter options</h1>-->
 
-</div>
+<!--    <form method="post" action="#" onsubmit="return false;">-->
+<!--      <div class="row mb-3">-->
+<!--        <label for="counties" class="col-sm-2 col-form-label">Counties</label>-->
+<!--        <div class="col-sm-10">-->
+<!--          <select id="counties" multiple>-->
+<!--            <option value="">Choose zero or more</option>-->
+<!--            <option>Carlow</option>-->
+<!--            <option>Cavan</option>-->
+<!--            <option>Clare</option>-->
+<!--            <option>Cork</option>-->
+<!--            <option>Donegal</option>-->
+<!--            <option>Dublin</option>-->
+<!--            <option>Galway</option>-->
+<!--            <option>Kerry</option>-->
+<!--            <option>Kildare</option>-->
+<!--            <option>Kilkenny</option>-->
+<!--            <option>Laois</option>-->
+<!--            <option>Leitrim</option>-->
+<!--            <option>Limerick</option>-->
+<!--            <option>Longford</option>-->
+<!--            <option>Louth</option>-->
+<!--            <option>Mayo</option>-->
+<!--            <option>Meath</option>-->
+<!--            <option>Monaghan</option>-->
+<!--            <option>Offaly</option>-->
+<!--            <option>Roscommon</option>-->
+<!--            <option>Sligo</option>-->
+<!--            <option>Tipperary</option>-->
+<!--            <option>Waterford</option>-->
+<!--            <option>Westmeath</option>-->
+<!--            <option>Wexford</option>-->
+<!--            <option>Wicklow</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--    </form>-->
+<!--  </div>-->
+
+<!--</div>-->
 <script type="text/javascript" src="js/map.js"></script>
 </body>
 </html>
