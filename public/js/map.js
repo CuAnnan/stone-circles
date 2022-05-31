@@ -3,8 +3,6 @@
     let sidebar = false;
     let markers = {};
     let markersOnScreen = {};
-    let counties =[], $counties;
-    let siteTypes = [], $siteTypes;
     let filters;
 
     let iconMap = {
@@ -21,6 +19,8 @@
         'Stone row':'stone row',
         'Cairn':'cairn'
     };
+    let favourites;
+    let currentSourceRequest;
 
     $(function(){
         $map = $('#map');
@@ -28,6 +28,16 @@
         // Form elements do not reset on a refresh.
         // This allows us to save the state of the search.
         assignFilters();
+        let storedFaves = localStorage.getItem('favourites');
+        if(storedFaves) {
+            favourites = JSON.parse(atob(storedFaves));
+        }
+        else
+        {
+            favourites = [];
+        }
+
+        console.log(favourites);
 
 
         navigator.geolocation.getCurrentPosition(
@@ -116,22 +126,26 @@
         markTr.append(markTd);
         let markLink = document.createElement('a');
         markLink.href='#';
-        markLink.append(document.createTextNode('Favourite'));
+        markLink.append(document.createTextNode(favourites.indexOf(props.objectid)>=0?'Unfavourite':'Favourite'));
         markLink.addEventListener('click',()=>{
             let elem = document.getElementById(`image-${props.objectid}`);
             let filename = elem.src.split('/').pop().split('.').shift();
             let newFilename;
+
             if(filename.endsWith('-red'))
             {
                 newFilename=filename.replace('-red','');
-                markLink.innerText = 'Unfavourite';
+                markLink.innerText = 'Favourite';
+                favourites.splice(favourites.indexOf(props.objectid), 1);
             }
             else
             {
                 newFilename = `${filename}-red`
                 markLink.innerText = 'Unfavourite';
+                favourites.push(props.objectid);
             }
             elem.src=`/img/${newFilename}.png`;
+            localStorage.setItem('favourites', btoa(JSON.stringify(favourites)));
 
         });
         markTd.append(markLink);
@@ -160,15 +174,17 @@
                 let el = document.createElement('div');
                 el.classList.add('marker');
 
+                let favourite = favourites.indexOf(props.objectid)>=0;
+
                 let img = document.createElement('img');
                 img.id = `image-${id}`;
                 if(iconMap[props.classdesc])
                 {
-                    img.src = `/img/${iconMap[props.classdesc]}.png`;
+                    img.src = `/img/${iconMap[props.classdesc]}${favourite?'-red':''}.png`;
                 }
                 else
                 {
-                    img.src='/img/monument.png';
+                    img.src=`/img/monument${favourite?'-red':''}.png`;
                 }
 
                 el.append(img);
@@ -177,11 +193,6 @@
                     .setLngLat(coords);
 
                 let popup = new maplibregl.Popup({ offset: 25 }).setDOMContent(createTable(props, marker));
-                //     `<table class="popup-table">
-                //         <tr><td colspan="2"><a href="http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}">Navigate here</a></td></tr>
-                //         <tr><td colspan="2"><div>Flag as interesting</div></td></tr>
-                //     </table>`
-                // );
 
                 marker.setPopup(popup);
 
@@ -210,18 +221,6 @@
             zoom: 6.5
         });
 
-        let markerHeight = 50, markerRadius = 10, linearOffset = 25;
-        let popupOffsets = {
-            'top': [0, 0],
-            'top-left': [0,0],
-            'top-right': [0,0],
-            'bottom': [0, -markerHeight],
-            'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-            'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-            'left': [markerRadius, (markerHeight - markerRadius) * -1],
-            'right': [-markerRadius, (markerHeight - markerRadius) * -1]
-        };
-
         map.on('data', function (e) {
             if (e.sourceId !== 'sites' || !e.isSourceLoaded) return;
 
@@ -242,13 +241,18 @@
             map.removeSource('sites');
         }
 
+        if(currentSourceRequest)
+        {
+            currentSourceRequest.abort();
+        }
 
-        $.ajax({
+        currentSourceRequest = $.ajax({
             type:"POST",
             url:'/sites/GeoJSON',
             data:filters,
             dataType:"json"})
         .done(function(data){
+            currentSourceRequest = null;
             map.addSource('sites', {
                 type:'geojson',
                 data:data,
