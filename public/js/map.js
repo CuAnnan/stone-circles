@@ -9,6 +9,9 @@
 
     let iconMap = {
         'Stone circle':'cromlech',
+        'Stone circle - embanked':'cromlech',
+        'Stone circle - five-stone':'cromlech',
+        'Stone circle - multiple-stone':'cromlech',
         'Ringfort - rath':'rath',
         'Ringfort - cashel':'rath',
         'Ringfort - unclassified':'rath',
@@ -68,11 +71,79 @@
         updateSites();
     }
 
+    function createTextRow(heading, text)
+    {
+
+        let tr= document.createElement('tr');
+        let th =document.createElement('th');
+        th.append(document.createTextNode(heading));
+        tr.append(th);
+        let td = document.createElement('td');
+        td.append(document.createTextNode(text));
+        tr.append(td);
+        return tr;
+    }
+
+    function createTable(props)
+    {
+        let townland = props.townland_name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+            return letter.toUpperCase();
+        });
+        let county = props.county.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+            return letter.toUpperCase();
+        });
+
+        let tableElement = document.createElement('table');
+        tableElement.classList.add('popup-table');
+        tableElement.append(createTextRow('County:', county));
+        tableElement.append(createTextRow('Townland:', townland));
+        tableElement.append(createTextRow('Type:', props.classdesc));
+        tableElement.append(createTextRow('SMRS:', props.smrs));
+
+        let linkTr = document.createElement('tr');
+        let linkTd = document.createElement('td');
+        linkTd.colSpan=2;
+        linkTr.append(linkTd);
+        let linkA = document.createElement('a');
+        linkA.href=`http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}`;
+        linkA.append(document.createTextNode('Get Directions'));
+        linkTd.append(linkA);
+        tableElement.append(linkTr);
+
+        let markTr = document.createElement('tr');
+        let markTd = document.createElement('td');
+        markTd.colspan=2;
+        markTr.append(markTd);
+        let markLink = document.createElement('a');
+        markLink.href='#';
+        markLink.append(document.createTextNode('Favourite'));
+        markLink.addEventListener('click',()=>{
+            let elem = document.getElementById(`image-${props.objectid}`);
+            let filename = elem.src.split('/').pop().split('.').shift();
+            let newFilename;
+            if(filename.endsWith('-red'))
+            {
+                newFilename=filename.replace('-red','');
+                markLink.innerText = 'Unfavourite';
+            }
+            else
+            {
+                newFilename = `${filename}-red`
+                markLink.innerText = 'Unfavourite';
+            }
+            elem.src=`/img/${newFilename}.png`;
+
+        });
+        markTd.append(markLink);
+        tableElement.append(markTr);
+
+        return tableElement;
+    }
+
     function updateMarkers()
     {
         let newMarkers = {};
         let features = map.querySourceFeatures('sites');
-        let consoled = false;
 
         for(let feature of features)
         {
@@ -90,6 +161,7 @@
                 el.classList.add('marker');
 
                 let img = document.createElement('img');
+                img.id = `image-${id}`;
                 if(iconMap[props.classdesc])
                 {
                     img.src = `/img/${iconMap[props.classdesc]}.png`;
@@ -101,26 +173,17 @@
 
                 el.append(img);
 
-                let townland = props.townland_name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-                    return letter.toUpperCase();
-                });
-                let county = props.county.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-                    return letter.toUpperCase();
-                });
-
-                let popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-                    `<table class="popup-table">
-                        <tr><th>County:</th><td>${county}</td></tr>
-                        <tr><th>Townland:</th><td>${townland}</td></tr>
-                        <tr><th>Type:</th><td>${props.classdesc}</td></tr>
-                        <tr><th>SMRS:</th><td>${props.smrs}</td></tr>
-                        <tr><td><a href="http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}">Navigate here</a></td></tr>
-                    </table>`
-                );
-
                 marker = markers[id] = new maplibregl.Marker({element:el})
-                    .setLngLat(coords)
-                    .setPopup(popup);
+                    .setLngLat(coords);
+
+                let popup = new maplibregl.Popup({ offset: 25 }).setDOMContent(createTable(props, marker));
+                //     `<table class="popup-table">
+                //         <tr><td colspan="2"><a href="http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}">Navigate here</a></td></tr>
+                //         <tr><td colspan="2"><div>Flag as interesting</div></td></tr>
+                //     </table>`
+                // );
+
+                marker.setPopup(popup);
 
             }
             newMarkers[id] = marker;
