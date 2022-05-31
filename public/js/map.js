@@ -5,10 +5,27 @@
     let markersOnScreen = {};
     let counties =[], $counties;
     let siteTypes = [], $siteTypes;
+    let filters;
+
+    let iconMap = {
+        'Stone circle':'cromlech',
+        'Ringfort - rath':'rath',
+        'Ringfort - cashel':'rath',
+        'Ringfort - unclassified':'rath',
+        'Megalithic structure':'megalith',
+        'Megalithic tomb':'megalith',
+        'Standing stone':'standing stone',
+        'Stone row':'stone row',
+        'Cairn':'cairn'
+    };
 
     $(function(){
         $map = $('#map');
         $('#doFilter').click(applyFilter);
+        // Form elements do not reset on a refresh.
+        // This allows us to save the state of the search.
+        assignFilters();
+
 
         navigator.geolocation.getCurrentPosition(
             (pos)=>{
@@ -23,6 +40,7 @@
                 maximumAge: 0
             }
         );
+
         $('#doubleArrow').click(()=>{
             sidebar = !sidebar;
             if(sidebar)
@@ -36,13 +54,18 @@
         });
     });
 
-    function applyFilter()
+    function assignFilters()
     {
-        let filters = {
+        filters = {
             counties:$('#counties').val(),
             types:$('#siteTypes').val()
         };
-        updateSites(filters);
+    }
+
+    function applyFilter()
+    {
+        assignFilters();
+        updateSites();
     }
 
     function updateMarkers()
@@ -67,19 +90,15 @@
                 el.classList.add('marker');
 
                 let img = document.createElement('img');
-                if(props.classdesc.startsWith('Stone circle'))
+                if(iconMap[props.classdesc])
                 {
-                    console.log(props);
-                    img.src = '/img/cromlech.png';
-                }
-                else if(props.classdesc.startsWith('Megalithic'))
-                {
-                    img.src = '/img/megalith.png';
+                    img.src = `/img/${iconMap[props.classdesc]}.png`;
                 }
                 else
                 {
                     img.src='/img/monument.png';
                 }
+
                 el.append(img);
 
                 let townland = props.townland_name.toLowerCase().replace(/\b[a-z]/g, function(letter) {
@@ -151,7 +170,7 @@
         map.once("load", ()=>{updateSites();});
     }
 
-    function updateSites(filters)
+    function updateSites()
     {
         if(map.getSource('sites')) {
             map.removeLayer('clusters');

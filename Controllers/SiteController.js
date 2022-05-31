@@ -53,6 +53,10 @@ class SiteController extends Controller
                 }
                 qry.$and.push({'county':{'$in':counties}});
             }
+            else
+            {
+                qry.$and.push({'county':rCounties.toUpperCase()});
+            }
         }
 
         let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();

@@ -9,6 +9,12 @@ var debug = require('debug')('stone-circle:server');
 var https = require('https');
 const fs = require('fs');
 
+app.get('*', function(req, res){
+  res.redirect(`https://${req.headers.host}${req.url}`);
+});
+
+app.listen(80);
+
 /**
  * Get port from environment and store in Express.
  */

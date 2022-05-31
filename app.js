@@ -10,6 +10,12 @@ let sitesRouter = require('./routes/sites');
 
 let app = express();
 
+const favicon = require('serve-favicon');
+
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
