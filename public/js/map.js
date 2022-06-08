@@ -39,6 +39,7 @@
         {
             favourites = [];
         }
+        loadMap();
 
         // navigator.geolocation.getCurrentPosition(
         //     (pos)=>{
