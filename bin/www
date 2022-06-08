@@ -13,14 +13,17 @@ app.get('*', function(req, res){
   res.redirect(`https://${req.headers.host}${req.url}`);
 });
 
-app.listen(80);
 
 /**
  * Get port from environment and store in Express.
  */
 
 var port = normalizePort(process.env.PORT || '3000');
+
+app.listen(80);
+
 app.set('port', port);
+
 
 /**
  * Create HTTPS server.
