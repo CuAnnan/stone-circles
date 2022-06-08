@@ -37,22 +37,19 @@
             favourites = [];
         }
 
-        console.log(favourites);
-
-
-        navigator.geolocation.getCurrentPosition(
-            (pos)=>{
-                loadMap(pos.coords);
-            },
-            (err)=>{
-                console.log(err);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            }
-        );
+        // navigator.geolocation.getCurrentPosition(
+        //     (pos)=>{
+        //         loadMap(pos.coords);
+        //     },
+        //     (err)=>{
+        //         console.log(err);
+        //     },
+        //     {
+        //         enableHighAccuracy: true,
+        //         timeout: 5000,
+        //         maximumAge: 0
+        //     }
+        // );
 
         $('#doubleArrow').click(()=>{
             sidebar = !sidebar;
