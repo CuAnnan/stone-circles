@@ -7,20 +7,19 @@
 var app = require('../app');
 var debug = require('debug')('stone-circle:server');
 var https = require('https');
+var http = require('http');
 const fs = require('fs');
 
-app.get('*', function(req, res){
-  res.redirect(`https://${req.headers.host}${req.url}`);
-});
+// app.get('*', function(req, res){
+//   res.redirect(`https://${req.headers.host}${req.url}`);
+// });
 
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-
-app.listen(80);
+let port = normalizePort(process.env.PORT || '3000');
 
 app.set('port', port);
 
@@ -29,16 +28,17 @@ app.set('port', port);
  * Create HTTPS server.
  */
 
-const ssl= {
-  key:fs.readFileSync('./security/cert.key',{encoding:"utf8"}),
-  cert:fs.readFileSync('./security/cert.pem',{encoding:"utf8"}),
-};
+// const ssl= {
+//   key:fs.readFileSync('./security/cert.key',{encoding:"utf8"}),
+//   cert:fs.readFileSync('./security/cert.pem',{encoding:"utf8"}),
+// };
 
-var server = https.createServer(ssl, app);
+// var server = https.createServer(ssl, app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
+let server = http.createServer(app);
 
 server.listen(port);
 server.on('error', onError);
