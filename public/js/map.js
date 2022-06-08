@@ -23,6 +23,9 @@
     let currentSourceRequest;
 
     $(function(){
+
+        console.log('Page load run');
+
         $map = $('#map');
         $('#doFilter').click(applyFilter);
         // Form elements do not reset on a refresh.
