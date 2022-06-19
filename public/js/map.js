@@ -109,7 +109,19 @@
         tableElement.append(createTextRow('County:', county));
         tableElement.append(createTextRow('Townland:', townland));
         tableElement.append(createTextRow('Type:', props.classdesc));
-        tableElement.append(createTextRow('SMRS:', props.smrs));
+
+        let smrsLinkTR = document.createElement('tr');
+        tableElement.append(smrsLinkTR);
+        let smrsLinkTH = document.createElement('th');
+        smrsLinkTH.append(document.createTextNode('SMRS'));
+        smrsLinkTR.append(smrsLinkTH);
+        let smrsLinkTD = document.createElement('td');
+        smrsLinkTR.append(smrsLinkTD);
+        let smrsLinkA = document.createElement('a');
+        smrsLinkA.href = `https://maps.archaeology.ie/HistoricEnvironment/?SMRS=${props.smrs}`;
+        smrsLinkA.append(document.createTextNode(props.smrs));
+        smrsLinkA.target = '_BLANK';
+        smrsLinkTD.append(smrsLinkA);
 
         let linkTr = document.createElement('tr');
         let linkTd = document.createElement('td');
@@ -117,6 +129,7 @@
         linkTr.append(linkTd);
         let linkA = document.createElement('a');
         linkA.href=`http://maps.apple.com?ll=${props.latitude},${props.longitude}&q=${townland} ${props.classdesc}`;
+        linkA.target='_BLANK';
         linkA.append(document.createTextNode('Get Directions'));
         linkTd.append(linkA);
         tableElement.append(linkTr);
