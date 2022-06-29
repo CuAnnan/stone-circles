@@ -10,6 +10,8 @@
         'Stone circle - embanked':'cromlech',
         'Stone circle - five-stone':'cromlech',
         'Stone circle - multiple-stone':'cromlech',
+        'Castle - motte and bailey':'motte',
+        'Castle - motte':'motte',
         'Ringfort - rath':'rath',
         'Ringfort - cashel':'rath',
         'Ringfort - unclassified':'rath',

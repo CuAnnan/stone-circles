@@ -22,7 +22,7 @@ for(let simpleQryVariable of simpleQryVariables)
     allQryTypes[simpleQryVariable] = {'name':simpleQryVariable};
 }
 
-const simpleFixes = ["Bullaun stone","Cairn","Megalithic structure","Megalithic tomb","Ogham stone","Ringfort","Rock art","Standing stone","Stone circle"];
+const simpleFixes = ["Bullaun stone","Cairn","Megalithic structure","Megalithic tomb", "Ogham stone","Ringfort","Rock art","Standing stone","Stone circle", "motte"];
 for(let fix of simpleFixes)
 {
     allQryTypes[fix]={"name":{"$regex":`${fix}.*`}};
