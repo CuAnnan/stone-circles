@@ -25,9 +25,6 @@
     let currentSourceRequest;
 
     $(function(){
-
-        console.log('Page load run');
-
         $map = $('#map');
         $('#doFilter').click(applyFilter);
         // Form elements do not reset on a refresh.
@@ -41,21 +38,20 @@
         {
             favourites = [];
         }
-        loadMap();
 
-        // navigator.geolocation.getCurrentPosition(
-        //     (pos)=>{
-        //         loadMap(pos.coords);
-        //     },
-        //     (err)=>{
-        //         console.log(err);
-        //     },
-        //     {
-        //         enableHighAccuracy: true,
-        //         timeout: 5000,
-        //         maximumAge: 0
-        //     }
-        // );
+        navigator.geolocation.getCurrentPosition(
+            (pos)=>{
+                loadMap(pos.coords);
+            },
+            (err)=>{
+                console.log(err);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
 
         $('#doubleArrow').click(()=>{
             sidebar = !sidebar;
@@ -236,6 +232,13 @@
             center: [-7.503210, 53.44939],
             zoom: 6.5
         });
+
+        map.addControl(
+            new maplibregl.GeolocateControl({
+                positionOptions: {enableHighAccuracy: true},
+                trackUserLocation: true
+            })
+        );
 
         map.on('data', function (e) {
             if (e.sourceId !== 'sites' || !e.isSourceLoaded) return;
