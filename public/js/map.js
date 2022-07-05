@@ -225,7 +225,8 @@
         image.src = 'img/compass.png';
 
         let locationMarker = new maplibregl.Marker({
-            element:image
+            element:image,
+            rotationAlignment:map,
         });
 
         let geolocate = new maplibregl.GeolocateControl({
@@ -240,7 +241,7 @@
             this.customMarker.setLngLat([data.coords.longitude, data.coords.latitude]);
             if(data.coords.heading)
             {
-                this.customMarker.setRotation(data.coords.heading);
+                this.customMarker.rotation(data.coords.heading);
             }
             if(this.needsAdding)
             {
