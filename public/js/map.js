@@ -39,19 +39,7 @@
             favourites = [];
         }
 
-        navigator.geolocation.getCurrentPosition(
-            (pos)=>{
-                loadMap(pos.coords);
-            },
-            (err)=>{
-                console.log(err);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            }
-        );
+        loadMap();
 
         $('#doubleArrow').click(()=>{
             sidebar = !sidebar;
@@ -233,12 +221,33 @@
             zoom: 6.5
         });
 
-        map.addControl(
-            new maplibregl.GeolocateControl({
-                positionOptions: {enableHighAccuracy: true},
-                trackUserLocation: true
-            })
-        );
+        let image = document.createElement('img');
+        image.src = 'img/compass.png';
+
+        let locationMarker = new maplibregl.Marker({
+            element:image
+        });
+
+        let geolocate = new maplibregl.GeolocateControl({
+            positionOptions: {enableHighAccuracy: true},
+            showUserLocation:false,
+            trackUserLocation: true
+        });
+        geolocate.customMarker = locationMarker;
+        geolocate.needsAdding = true;
+        map.addControl(geolocate);
+        geolocate.on('geolocate', function(data){;
+            this.customMarker.setLngLat([data.coords.longitude, data.coords.latitude]);
+            if(data.coords.heading)
+            {
+                this.customMarker.setRotation(data.coords.heading);
+            }
+            if(this.needsAdding)
+            {
+                this.customMarker.addTo(map);
+                this.needsAdding = false;
+            }
+        });
 
         map.on('data', function (e) {
             if (e.sourceId !== 'sites' || !e.isSourceLoaded) return;
@@ -248,7 +257,10 @@
             updateMarkers();
         });
 
-        map.once("load", ()=>{updateSites();});
+        map.once("load", ()=>{
+            geolocate.trigger();
+            updateSites();
+        });
     }
 
     function updateSites()
