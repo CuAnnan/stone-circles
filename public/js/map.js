@@ -226,7 +226,7 @@
 
         let locationMarker = new maplibregl.Marker({
             element:image,
-            rotationAlignment:map,
+            rotationAlignment:'map',
         });
 
         let geolocate = new maplibregl.GeolocateControl({
@@ -239,9 +239,9 @@
         map.addControl(geolocate);
         geolocate.on('geolocate', function(data){;
             this.customMarker.setLngLat([data.coords.longitude, data.coords.latitude]);
-            if(data.coords.heading)
+            if(data.coords.heading !== null)
             {
-                this.customMarker.rotation(data.coords.heading);
+                this.customMarker.setRotation(data.coords.heading);
             }
             if(this.needsAdding)
             {
