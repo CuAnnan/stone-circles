@@ -239,9 +239,10 @@
         map.addControl(geolocate);
         geolocate.on('geolocate', function(data){;
             this.customMarker.setLngLat([data.coords.longitude, data.coords.latitude]);
-            if(data.coords.heading !== null)
+            let heading = data.coords.heading;
+            if(heading !== null)
             {
-                this.customMarker.setRotation(data.coords.heading);
+                this.customMarker.setRotation(heading);
             }
             if(this.needsAdding)
             {
