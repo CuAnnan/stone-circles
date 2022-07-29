@@ -4,6 +4,17 @@
     let markers = {};
     let markersOnScreen = {};
     let filters;
+    let $modal;
+    let siteTypes;
+
+    // In the following line, you should include the prefixes of implementations you want to test.
+    window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    // DON'T use "var indexedDB = …" if you're not in a function.
+    // Moreover, you may need references to some window.IDB* objects:
+    window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: "readwrite"}; // This line should only be needed if it is needed to support the object's constants for older browsers
+    window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+    let db;
 
     let iconMap = {
         'Stone circle':'cromlech',
@@ -22,11 +33,12 @@
         'Cairn':'cairn'
     };
     let favourites;
-    let currentSourceRequest;
 
     $(function(){
         $map = $('#map');
         $('#doFilter').click(applyFilter);
+        $modal = $('#loadingModal').modal({show:true, keyboard:false, backdrop:'static'}).modal('show');
+
         // Form elements do not reset on a refresh.
         // This allows us to save the state of the search.
         assignFilters();
@@ -39,7 +51,30 @@
             favourites = [];
         }
 
-        loadMap();
+        const request = indexedDB.open("clochaDB", 1);
+        request.onerror = (evt)=>{
+            console.warn(evt);
+        }
+        request.onsuccess = (evt)=>{
+            db = evt.target.result;
+            loadSites()
+                .then((data)=>{
+                    loadMap(data);
+                })
+                .catch((error)=>{
+                    console.warn(error);
+                });
+
+        };
+        request.onupgradeneeded = (evt)=>{
+            const db = evt.target.result;
+            // the smrs for the site is unique. It will do as a keypath
+            const objectStore = db.createObjectStore("sites", {keyPath:'smrs'});
+            objectStore.createIndex('county', 'county', {unique:false});
+            objectStore.createIndex('type', 'type', {unique:false});
+        }
+
+
 
         $('#doubleArrow').click(()=>{
             sidebar = !sidebar;
@@ -52,6 +87,7 @@
                 $map.css({'right':"0%"});
             }
         });
+
     });
 
     function assignFilters()
@@ -65,7 +101,7 @@
     function applyFilter()
     {
         assignFilters();
-        updateSites();
+        filterSites();
     }
 
     function createTextRow(heading, text)
@@ -126,9 +162,9 @@
         markTr.append(markTd);
         let markLink = document.createElement('a');
         markLink.href='#';
-        markLink.append(document.createTextNode(favourites.indexOf(props.objectid)>=0?'Unfavourite':'Favourite'));
+        markLink.append(document.createTextNode(favourites.indexOf(props.smrs)>=0?'Unfavourite':'Favourite'));
         markLink.addEventListener('click',()=>{
-            let elem = document.getElementById(`image-${props.objectid}`);
+            let elem = document.getElementById(`image-${props.smrs}`);
             let filename = elem.src.split('/').pop().split('.').shift();
             let newFilename;
 
@@ -136,13 +172,13 @@
             {
                 newFilename=filename.replace('-red','');
                 markLink.innerText = 'Favourite';
-                favourites.splice(favourites.indexOf(props.objectid), 1);
+                favourites.splice(favourites.indexOf(props.smrs), 1);
             }
             else
             {
                 newFilename = `${filename}-red`
                 markLink.innerText = 'Unfavourite';
-                favourites.push(props.objectid);
+                favourites.push(props.smrs);
             }
             elem.src=`/img/${newFilename}.png`;
             localStorage.setItem('favourites', btoa(JSON.stringify(favourites)));
@@ -167,14 +203,15 @@
             {
                 continue;
             }
-            let id = props.objectid;
+
+            let id = props.smrs;
             let marker = markers[id];
             if(!marker)
             {
                 let el = document.createElement('div');
                 el.classList.add('marker');
 
-                let favourite = favourites.indexOf(props.objectid)>=0;
+                let favourite = favourites.indexOf(props.smrs)>=0;
 
                 let img = document.createElement('img');
                 img.id = `image-${id}`;
@@ -210,7 +247,7 @@
         markersOnScreen = newMarkers;
     }
 
-    function loadMap()
+    function loadMap(data)
     {
 
         map = new maplibregl.Map({
@@ -253,19 +290,113 @@
 
         map.on('data', function (e) {
             if (e.sourceId !== 'sites' || !e.isSourceLoaded) return;
-
+            console.info('Updating sites');
             map.on('move', updateMarkers);
             map.on('moveend', updateMarkers);
             updateMarkers();
         });
 
         map.once("load", ()=>{
+            updateSites(data);
             geolocate.trigger();
-            updateSites();
         });
     }
 
-    function updateSites()
+    async function loadSites() {
+        return new Promise((resolve, reject)=>
+        {
+            // check the last remote load
+            let lastRemoteLoadDate = localStorage.getItem('lastRemoteLoad');
+
+            // get all the sites since the last remote load
+            $.ajax({
+                type: 'get',
+                url: '/sites/geoJSONByDate',
+                data: {lastUpdated: lastRemoteLoadDate},
+                dataType: 'json'
+            }).done(function (data) {
+                // get the local data
+                let sites = data.sites;
+                const transaction = db.transaction(["sites"], 'readwrite');
+                transaction.oncomplete = (evt) => {
+                    readIndexedDB().then(
+                        (data)=>{
+                            resolve(data);
+                        }
+                    );
+                };
+                transaction.onerror = (evt) => {
+                    reject(evt);
+                }
+
+                const objectStore = transaction.objectStore('sites');
+                sites.forEach((site) => {
+                    const request = objectStore.put(site);
+                    request.onerror = (evt) => {
+                        reject(evt);
+                    }
+                });
+                transaction.commit();
+                $modal.modal('hide');
+            });
+        });
+    }
+
+    function readIndexedDB()
+    {
+        return new Promise((resolve, reject)=>{
+            const transaction = db.transaction(["sites"], 'readwrite');
+            const objectStore = transaction.objectStore('sites');
+            let response = {
+                type: 'FeatureCollection',
+                "crs": {
+                    "type": "link",
+                    "properties": {
+                        "href": "http://spatialreference.org/ref/epsg/26912/esriwkt/",
+                        "type": "esriwkt"
+                    }
+                },
+                features: []
+            };
+
+            const request = objectStore.openCursor();
+            request.onsuccess = (evt) => {
+                const cursor = evt.target.result;
+                if (cursor) {
+                    let site = cursor.value;
+                    let push = true;
+                    // check for filtering
+                    if((filters.counties.length && !filters.counties.includes(site.county)) || (filters.types.length && !filters.types.includes(site.type)))
+                    {
+                        push = false;
+                    }
+
+                    if(push) {
+                        response.features.push({
+                            type: 'Feature',
+                            properties: site,
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [site.longitude, site.latitude, 0]
+                            }
+                        });
+                    }
+                    cursor.continue();
+                }
+                else
+                {
+                    resolve(response);
+                }
+            };
+        });
+    }
+
+    function filterSites()
+    {
+        readIndexedDB().then((data)=>{updateSites(data)});
+    }
+
+    function updateSites(data)
     {
         if(map.getSource('sites')) {
             map.removeLayer('clusters');
@@ -274,65 +405,52 @@
             map.removeSource('sites');
         }
 
-        if(currentSourceRequest)
-        {
-            currentSourceRequest.abort();
-        }
+        map.addSource('sites', {
+            type:'geojson',
+            data:data,
+            cluster:true,
+            clusterMaxZoom:10,
+            clusterRadius:35
+        });
 
-        currentSourceRequest = $.ajax({
-            type:"POST",
-            url:'/sites/GeoJSON',
-            data:filters,
-            dataType:"json"})
-        .done(function(data){
-            currentSourceRequest = null;
-            map.addSource('sites', {
-                type:'geojson',
-                data:data,
-                cluster:true,
-                clusterMaxZoom:10,
-                clusterRadius:35
-            });
+        map.addLayer({
+            id:'clusters',
+            type:'circle',
+            source:'sites',
+            filter: ['has', 'point_count'],
+            paint: {
+                'circle-color': '#66C547',
+                'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    20,
+                    100,
+                    30,
+                    750,
+                    40
+                ]
+            }
+        });
 
-            map.addLayer({
-                id:'clusters',
-                type:'circle',
-                source:'sites',
-                filter: ['has', 'point_count'],
-                paint: {
-                    'circle-color': '#66C547',
-                    'circle-radius': [
-                        'step',
-                        ['get', 'point_count'],
-                        20,
-                        100,
-                        30,
-                        750,
-                        40
-                    ]
-                }
-            });
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'sites',
+            filter: ['has', 'point_count'],
+            layout: {
+                'text-field': '{point_count_abbreviated}',
+                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                'text-size': 12
+            }
+        });
 
-            map.addLayer({
-                id: 'cluster-count',
-                type: 'symbol',
-                source: 'sites',
-                filter: ['has', 'point_count'],
-                layout: {
-                    'text-field': '{point_count_abbreviated}',
-                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                    'text-size': 12
-                }
-            });
-
-            map.addLayer({
-                id:'unclustered',
-                type:'symbol',
-                source:'sites',
-                filter: ['!', ['has', 'point_count']],
-                'icon-anchor':'bottom',
-                'icon-image':'/imgs/cromlech.png'
-            });
+        map.addLayer({
+            id:'unclustered',
+            type:'symbol',
+            source:'sites',
+            filter: ['!', ['has', 'point_count']],
+            'icon-anchor':'bottom',
+            'icon-image':'/imgs/cromlech.png'
         });
     }
 })(window.jQuery);

@@ -31,38 +31,6 @@ for(let fix of simpleFixes)
 
 class SiteController extends Controller
 {
-    static async getSites(req, res)
-    {
-        let db=this.getDB(req, res);
-        let types = await this.getSiteTypes(req, res);
-        let qry = {
-            '$and':[
-                {'classdesc':{'$in':types}},
-                {"longitude":{"$gte":-15}}
-            ]
-        };
-
-        let rCounties = req.body['counties[]'];
-
-        if(rCounties)
-        {
-            if(typeof rCounties === 'object') {
-                let counties = [];
-                for (let county of rCounties) {
-                    counties.push(county.toUpperCase());
-                }
-                qry.$and.push({'county':{'$in':counties}});
-            }
-            else
-            {
-                qry.$and.push({'county':rCounties.toUpperCase()});
-            }
-        }
-
-        let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();
-        return sites;
-    }
-
     static async getGeoJSONByDate(req, res)
     {
         let db=this.getDB(req, res);
@@ -74,46 +42,13 @@ class SiteController extends Controller
                 {"longitude":{"$gte":-15}}
             ]
         };
-
-        /*
         if(req.query.lastUpdated)
         {
             qry.$and.push({'lastUpdated':{"$gte":req.query.lastUpdated}});
         }
-    */
+
         let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();
         let response = {sites:sites}
-
-        res.json(response);
-    }
-
-    static async getSitesForAreaAsFeatures(req, res)
-    {
-        let sites = await this.getSites(req, res);
-
-        let response = {
-            type:'FeatureCollection',
-            "crs": {
-                "type": "link",
-                "properties": {
-                    "href": "http://spatialreference.org/ref/epsg/26912/esriwkt/",
-                    "type": "esriwkt"
-                }
-            },
-            features:[]
-        };
-
-        for(let site of sites)
-        {
-            response.features.push({
-                type:'Feature',
-                properties:site,
-                geometry:{
-                    type:'Point',
-                    coordinates:[site.longitude, site.latitude, 0]
-                }
-            });
-        }
 
         res.json(response);
     }
@@ -121,36 +56,8 @@ class SiteController extends Controller
     static async getSiteTypes(req, res)
     {
         let db=this.getDB(req, res);
-        let $orFilter = [];
-        let bTypes =req.body['types[]'];
 
-        if(bTypes)
-        {
-            if(typeof bTypes === 'object') {
-                for (let type of bTypes) {
-                    let qryType = allQryTypes[type];
-                    if (!qryType) {
-                        console.log(`${type} not found`);
-                    }
-                    $orFilter.push(qryType);
-                }
-            }
-            else
-            {
-                $orFilter.push(allQryTypes[bTypes]);
-            }
-        }
-        else
-        {
-            $orFilter = Object.values(allQryTypes);
-        }
-
-        let typesJSON = await db.collection('types').find(
-            {
-                "$or":$orFilter
-            },
-            {projection:{ _id: 0 }}
-        ).toArray();
+        let typesJSON = await db.collection('types').find({"$or":Object.values(allQryTypes)},{projection:{ _id: 0 }}).toArray();
 
         let types = [];
         for(let val of typesJSON)
@@ -164,6 +71,11 @@ class SiteController extends Controller
     {
         let types = await this.getSiteTypes(req, res);
         res.json({success:true, types:types});
+    }
+
+    static async getQryTypeFixes(req, res)
+    {
+        res.json(allQryTypes);
     }
 
     static async indexAction(req, res)

@@ -63,84 +63,99 @@
   <title>Clocha Site list</title>
 </head>
 <body>
-<div id="map" class="map">
-  <div id="doubleArrow">&gt;&gt;</div>
-</div>
-<div id="filters">
-  <div class="container">
-  <h1>Filter options</h1>
-
-    <form method="post" action="#" onsubmit="return false;">
-      <div class="row mb-3">
-        <label for="counties" class="col-sm-2 col-form-label">Counties</label>
-        <div class="col-sm-10">
-          <select id="counties" name="counties" multiple>
-            <option value="">Choose zero or more</option>
-            <option>Carlow</option>
-            <option>Cavan</option>
-            <option>Clare</option>
-            <option>Cork</option>
-            <option>Donegal</option>
-            <option>Dublin</option>
-            <option>Galway</option>
-            <option>Kerry</option>
-            <option>Kildare</option>
-            <option>Kilkenny</option>
-            <option>Laois</option>
-            <option>Leitrim</option>
-            <option>Limerick</option>
-            <option>Longford</option>
-            <option>Louth</option>
-            <option>Mayo</option>
-            <option>Meath</option>
-            <option>Monaghan</option>
-            <option>Offaly</option>
-            <option>Roscommon</option>
-            <option>Sligo</option>
-            <option>Tipperary</option>
-            <option>Waterford</option>
-            <option>Westmeath</option>
-            <option>Wexford</option>
-            <option>Wicklow</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="siteTypes" class="col-sm-2 col-form-label">Site Type(s)</label>
-        <div class="col-sm-10">
-          <select id="siteTypes" name="siteTypes" multiple>
-            <option value="">Choose zero or more</option>
-            <option>Anomalous stone group</option>
-            <option>Boulder-burial</option>
-            <option>Bullaun stone</option>
-            <option>Cairn</option>
-            <option>Cliff-edge fort</option>
-            <option>Henge</option>
-            <option>Hillfort</option>
-            <option>Hilltop enclosure</option>
-            <option>Megalithic structure</option>
-            <option>Megalithic tomb</option>
-            <option>Motte</option>
-            <option>Ogham stone</option>
-            <option>Ringfort</option>
-            <option>Rock art</option>
-            <option>Standing stone</option>
-            <option>Stone circle</option>
-            <option>Stone row</option>
-            <option>Stone sculpture - aniconic</option>
-            <option>Stone sculpture - iconic</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <button class="btn btn-primary" id="doFilter">Filter</button>
-        </div>
-      </div>
-    </form>
+<div class="container">
+  <div id="map" class="map">
+    <div id="doubleArrow">&gt;&gt;</div>
   </div>
+  <div id="filters">
+    <div class="container">
+    <h1>Filter options</h1>
 
+      <form method="post" action="#" onsubmit="return false;">
+        <div class="row mb-3">
+          <label for="counties" class="col-sm-2 col-form-label">Counties</label>
+          <div class="col-sm-10">
+            <select id="counties" name="counties" multiple>
+              <option value="">Choose zero or more</option>
+              <option value="CARLOW">Carlow</option>
+              <option value="CAVAN">Cavan</option>
+              <option value="CLARE">Clare</option>
+              <option value="CORK">Cork</option>
+              <option value="DONEGAL">Donegal</option>
+              <option value="DUBLIN">Dublin</option>
+              <option value="GALWAY">Galway</option>
+              <option value="KERRY">Kerry</option>
+              <option value="KILDARE">Kildare</option>
+              <option value="KILKENNY">Kilkenny</option>
+              <option value="LAOIS">Laois</option>
+              <option value="LEITRIM">Leitrim</option>
+              <option value="LIMERICK">Limerick</option>
+              <option value="LONGFORD">Longford</option>
+              <option value="LOUTH">Louth</option>
+              <option value="MAYO">Mayo</option>
+              <option value="MEATH">Meath</option>
+              <option value="MONAGHAN">Monaghan</option>
+              <option value="OFFALY">Offaly</option>
+              <option value="ROSCOMMON">Roscommon</option>
+              <option value="SLIGO">Sligo</option>
+              <option value="TIPPERARY">Tipperary</option>
+              <option value="WATERFORD">Waterford</option>
+              <option value="WESTMEATH">Westmeath</option>
+              <option value="WEXFORD">Wexford</option>
+              <option value="WICKLOW">Wicklow</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label for="siteTypes" class="col-sm-2 col-form-label">Site Type(s)</label>
+          <div class="col-sm-10">
+            <select id="siteTypes" name="siteTypes" multiple>
+              <option value="">Choose zero or more</option>
+              <option>Anomalous Stone Group</option>
+              <option>Boulder-Burial</option>
+              <option>Bullaun Stone</option>
+              <option>Cairn</option>
+              <option>Cliff-edge Fort</option>
+              <option>Henge</option>
+              <option>Hillfort</option>
+              <option>Hilltop Enclosure</option>
+              <option>Megalithic Structure</option>
+              <option>Megalithic Tomb</option>
+              <option>Motte</option>
+              <option>Ogham Stone</option>
+              <option>Ringfort</option>
+              <option>Rock Art</option>
+              <option>Standing Stone</option>
+              <option>Stone Circle</option>
+              <option>Stone Row</option>
+              <option>Stone Sculpture</option>
+              <option>Stone Sculpture</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <button class="btn btn-primary" id="doFilter">Filter</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+  <div class="modal" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Loading, please be patient</h5>
+        </div>
+        <div class="modal-body">
+          We're loading ~15MB of data, please be patient
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script type="text/javascript" src="js/map.js"></script>
+
 </body>
 </html>
