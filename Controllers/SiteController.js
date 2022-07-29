@@ -63,12 +63,36 @@ class SiteController extends Controller
         return sites;
     }
 
+    static async getGeoJSONByDate(req, res)
+    {
+        let db=this.getDB(req, res);
+
+        let types = await this.getSiteTypes(req, res);
+        let qry = {
+            '$and':[
+                {'classdesc':{'$in':types}},
+                {"longitude":{"$gte":-15}}
+            ]
+        };
+
+        /*
+        if(req.query.lastUpdated)
+        {
+            qry.$and.push({'lastUpdated':{"$gte":req.query.lastUpdated}});
+        }
+    */
+        let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();
+        let response = {sites:sites}
+
+        res.json(response);
+    }
+
     static async getSitesForAreaAsFeatures(req, res)
     {
         let sites = await this.getSites(req, res);
 
         let response = {
-            type:'FeatureColelction',
+            type:'FeatureCollection',
             "crs": {
                 "type": "link",
                 "properties": {
