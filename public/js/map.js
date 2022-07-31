@@ -21,6 +21,7 @@
         'Stone circle - embanked':'cromlech',
         'Stone circle - five-stone':'cromlech',
         'Stone circle - multiple-stone':'cromlech',
+        'Ceremonial enclosure':'cromlech',
         'Castle - motte and bailey':'motte',
         'Castle - motte':'motte',
         'Ringfort - rath':'rath',
@@ -317,6 +318,7 @@
             }).done(function (data) {
                 // get the local data
                 let sites = data.sites;
+                console.log(sites);
                 const transaction = db.transaction(["sites"], 'readwrite');
                 transaction.oncomplete = (evt) => {
                     readIndexedDB().then(

@@ -6,6 +6,7 @@ const Controller = require('./Controller');
  */
 let simpleQryVariables = ["Anomalous stone group",
     "Boulder-burial",
+    "Ceremonial enclosure",
     "Cliff-edge fort",
     "Henge",
     "Hillfort",
@@ -28,7 +29,6 @@ for(let fix of simpleFixes)
     allQryTypes[fix]={"name":{"$regex":`${fix}.*`}};
 }
 
-
 class SiteController extends Controller
 {
     static async getGeoJSONByDate(req, res)
@@ -44,11 +44,14 @@ class SiteController extends Controller
         };
         if(req.query.lastUpdated)
         {
-            qry.$and.push({'lastUpdated':{"$gte":req.query.lastUpdated}});
+            qry.$and.push({'lastUpdate':{"$gte":parseInt(req.query.lastUpdated)}});
+            console.log(JSON.stringify(qry));
         }
 
         let sites = await db.collection('sites').find(qry, {projection:{ _id: 0 }}).toArray();
-        let response = {sites:sites}
+        let response = {sites:sites};
+
+        console.log(response);
 
         res.json(response);
     }
@@ -64,6 +67,7 @@ class SiteController extends Controller
         {
             types.push(val.name);
         }
+        console.log(types);
         return types;
     }
 
